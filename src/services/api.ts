@@ -56,7 +56,8 @@ export async function fetchJobs(params: {
 
 /**
  * Fetch a single job by ID
+ * Note: Backend returns the job object directly, not wrapped in { data: ... }
  */
-export async function fetchJobById(id: string) {
-  return fetchApi<{ data: ApiJob }>(`/api/jobs/${id}`)
+export async function fetchJobById(id: string): Promise<ApiJob> {
+  return fetchApi<ApiJob>(`/api/jobs/${id}`)
 }
