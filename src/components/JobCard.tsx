@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Clock } from 'lucide-react'
 import { Badge } from './ui/Badge'
-import { Card, CardContent } from './ui/Card'
+import { Card } from './ui/Card'
 import { formatDate } from '@/lib/utils'
 import type { Job } from '@/types/job'
 
