@@ -42,14 +42,16 @@ describe('JobCard', () => {
     expect(screen.getByText('San Francisco, CA')).toBeInTheDocument()
   })
 
-  it('shows company icon', () => {
+  it('shows company icon on title row', () => {
     render(<JobCard job={mockJob} isActive={false} />, {
       wrapper: createWrapper(),
     })
 
-    // Use data-testid to select the specific card
+    // Check that TechCorp is displayed (company name)
+    expect(screen.getByText('TechCorp')).toBeInTheDocument()
+    // Check that Building icon exists in the card
     const card = screen.getByTestId('job-card')
-    expect(card).toContainHTML('🏢')
+    expect(card.querySelector('.lucide-building')).toBeInTheDocument()
   })
 
   it('shows location, work arrangement and employment type with icons and text', () => {
