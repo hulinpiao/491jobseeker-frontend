@@ -4,56 +4,55 @@ import userEvent from '@testing-library/user-event'
 import { FilterPanel } from './FilterPanel'
 
 describe('FilterPanel', () => {
-  it('应该渲染筛选面板', () => {
+  it('should render filter panel', () => {
     render(
       <FilterPanel filters={{}} onChange={vi.fn()} />
     )
-    expect(screen.getByText('筛选条件')).toBeInTheDocument()
+    expect(screen.getByText('Filters')).toBeInTheDocument()
   })
 
-  it('应该显示地点输入框', () => {
+  it('should display location input', () => {
     render(<FilterPanel filters={{}} onChange={vi.fn()} />)
-    expect(screen.getByLabelText('工作地点')).toBeInTheDocument()
+    expect(screen.getByLabelText('Location')).toBeInTheDocument()
   })
 
-  it('应该支持输入地点并触发 onChange', async () => {
+  it('should support entering location and trigger onChange', async () => {
     const onChange = vi.fn()
     render(<FilterPanel filters={{}} onChange={onChange} />)
 
-    const input = screen.getByLabelText('工作地点')
+    const input = screen.getByLabelText('Location')
     await userEvent.type(input, 'Sydney')
 
-    // onChange 应该被调用
     expect(onChange).toHaveBeenCalled()
   })
 
-  it('应该显示传入的地点值', () => {
+  it('should display the passed location value', () => {
     render(<FilterPanel filters={{ location: 'Sydney' }} onChange={vi.fn()} />)
-    const input = screen.getByLabelText('工作地点') as HTMLInputElement
+    const input = screen.getByLabelText('Location') as HTMLInputElement
     expect(input.value).toBe('Sydney')
   })
 
-  it('应该支持选择工作类型并触发 onChange', async () => {
+  it('should support selecting employment type and trigger onChange', async () => {
     const onChange = vi.fn()
     render(<FilterPanel filters={{}} onChange={onChange} />)
 
-    const select = screen.getByLabelText('工作类型')
+    const select = screen.getByLabelText('Employment Type')
     await userEvent.selectOptions(select, 'full_time')
 
     expect(onChange).toHaveBeenCalled()
   })
 
-  it('应该支持选择工作方式并触发 onChange', async () => {
+  it('should support selecting work arrangement and trigger onChange', async () => {
     const onChange = vi.fn()
     render(<FilterPanel filters={{}} onChange={onChange} />)
 
-    const select = screen.getByLabelText('工作方式')
+    const select = screen.getByLabelText('Work Arrangement')
     await userEvent.selectOptions(select, 'remote')
 
     expect(onChange).toHaveBeenCalled()
   })
 
-  it('应该支持清除所有筛选', async () => {
+  it('should support clearing all filters', async () => {
     const onChange = vi.fn()
     render(
       <FilterPanel
@@ -62,21 +61,21 @@ describe('FilterPanel', () => {
       />
     )
 
-    const clearButton = screen.getByText('清除')
+    const clearButton = screen.getByText('Clear')
     await userEvent.click(clearButton)
 
     expect(onChange).toHaveBeenCalledWith({})
   })
 
-  it('有筛选条件时显示清除按钮', () => {
+  it('should show clear button when filters are active', () => {
     render(
       <FilterPanel filters={{ location: 'Sydney' }} onChange={vi.fn()} />
     )
-    expect(screen.getByText('清除')).toBeInTheDocument()
+    expect(screen.getByText('Clear')).toBeInTheDocument()
   })
 
-  it('无筛选条件时隐藏清除按钮', () => {
+  it('should hide clear button when no filters are active', () => {
     render(<FilterPanel filters={{}} onChange={vi.fn()} />)
-    expect(screen.queryByText('清除')).not.toBeInTheDocument()
+    expect(screen.queryByText('Clear')).not.toBeInTheDocument()
   })
 })

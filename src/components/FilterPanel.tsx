@@ -9,19 +9,19 @@ interface FilterPanelProps {
 }
 
 const EMPLOYMENT_TYPES = [
-  { value: '', label: '全部类型' },
-  { value: 'full_time', label: '全职' },
-  { value: 'part_time', label: '兼职' },
-  { value: 'contract', label: '合同工' },
-  { value: 'casual', label: '临时' },
-  { value: 'temporary', label: '短期' },
+  { value: '', label: 'All Types' },
+  { value: 'full_time', label: 'Full-time' },
+  { value: 'part_time', label: 'Part-time' },
+  { value: 'contract', label: 'Contract' },
+  { value: 'casual', label: 'Casual' },
+  { value: 'temporary', label: 'Temporary' },
 ] as const
 
 const WORK_ARRANGEMENTS = [
-  { value: '', label: '全部方式' },
-  { value: 'onsite', label: '现场办公' },
-  { value: 'hybrid', label: '混合办公' },
-  { value: 'remote', label: '远程办公' },
+  { value: '', label: 'All Arrangements' },
+  { value: 'onsite', label: 'On-site' },
+  { value: 'hybrid', label: 'Hybrid' },
+  { value: 'remote', label: 'Remote' },
 ] as const
 
 export function FilterPanel({ filters, onChange }: FilterPanelProps) {
@@ -36,32 +36,32 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
   const hasActiveFilters = Object.keys(filters).length > 0
 
   return (
-    <div className="space-y-4 rounded-lg border bg-card p-4">
+    <div className="space-y-4 rounded-lg border bg-card p-4" data-testid="filter-panel">
       <div className="flex items-center justify-between">
-        <h3 className="font-semibold">筛选条件</h3>
+        <h3 className="font-semibold">Filters</h3>
         {hasActiveFilters && (
           <Button variant="ghost" size="sm" onClick={clearFilters}>
-            清除
+            Clear
           </Button>
         )}
       </div>
 
-      <div className="space-y-3">
-        <div>
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex-1">
           <label htmlFor="location" className="mb-1 block text-sm font-medium">
-            工作地点
+            Location
           </label>
           <Input
             id="location"
-            placeholder="输入城市..."
+            placeholder="Enter city..."
             value={filters.location ?? ''}
             onChange={(e) => updateFilter('location', e.target.value)}
           />
         </div>
 
-        <div>
+        <div className="flex-1">
           <label htmlFor="employmentType" className="mb-1 block text-sm font-medium">
-            工作类型
+            Employment Type
           </label>
           <Select
             id="employmentType"
@@ -76,9 +76,9 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
           </Select>
         </div>
 
-        <div>
+        <div className="flex-1">
           <label htmlFor="workArrangement" className="mb-1 block text-sm font-medium">
-            工作方式
+            Work Arrangement
           </label>
           <Select
             id="workArrangement"

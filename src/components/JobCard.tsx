@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom'
 import { Clock } from 'lucide-react'
-import { Badge } from './ui/Badge'
 import { Card } from './ui/Card'
 import { formatDate } from '@/lib/utils'
 import type { Job } from '@/types/job'
@@ -31,16 +30,13 @@ export function JobCard({ job, isActive = false }: JobCardProps) {
         isActive ? 'border-primary bg-accent' : ''
       }`}
     >
-      <Link to={`/jobs/${job.id}`} className="block p-4">
-        {/* Job Title */}
-        <h3 className="text-xl font-bold line-clamp-1">{job.title}</h3>
-
-        {/* Company Info Bar */}
-        <div className="flex flex-wrap gap-2 mt-2">
-          <Badge variant="default">{job.company}</Badge>
-          <Badge variant="outline">{job.location}</Badge>
-          <Badge variant="secondary">{WORK_ARRANGEMENT_LABELS[job.workArrangement]}</Badge>
-          <Badge variant="outline">{EMPLOYMENT_TYPE_LABELS[job.employmentType]}</Badge>
+      <Link to={`/jobs/${job.id}`} className="block p-4" data-testid="job-card" data-job-id={job.id}>
+        {/* Job Title with Icons on Right */}
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="text-xl font-bold line-clamp-1 flex-1">{job.title}</h3>
+          <div className="flex items-center gap-1 text-lg shrink-0" title="Company">
+            <span>🏢</span>
+          </div>
         </div>
 
         {/* JD Preview */}
@@ -48,10 +44,24 @@ export function JobCard({ job, isActive = false }: JobCardProps) {
           {job.description}
         </p>
 
-        {/* Posted Date */}
-        <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground">
-          <Clock className="h-3 w-3" />
-          <span>Posted {formatDate(job.createdAt)}</span>
+        {/* Bottom Bar: Posted Date + Icons */}
+        <div className="flex items-center justify-between mt-3">
+          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <Clock className="h-3 w-3" />
+            <span>Posted {formatDate(job.createdAt)}</span>
+          </div>
+          <div className="flex items-center gap-3 text-sm">
+            <div className="flex items-center gap-1" title={`Location: ${job.location}`}>
+              <span>📍</span>
+              <span className="text-xs">{job.location}</span>
+            </div>
+            <div className="flex items-center gap-1" title={`Work Arrangement: ${WORK_ARRANGEMENT_LABELS[job.workArrangement]}`}>
+              <span>🏠</span>
+            </div>
+            <div className="flex items-center gap-1" title={`Employment Type: ${EMPLOYMENT_TYPE_LABELS[job.employmentType]}`}>
+              <span>💼</span>
+            </div>
+          </div>
         </div>
       </Link>
     </Card>

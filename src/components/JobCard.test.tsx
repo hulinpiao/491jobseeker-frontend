@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { JobCard } from './JobCard'
@@ -36,17 +36,28 @@ describe('JobCard', () => {
     })
 
     expect(screen.getByText('Senior Frontend Engineer')).toBeInTheDocument()
-    expect(screen.getByText('TechCorp')).toBeInTheDocument()
+    // Location text should still be present (displayed next to the pin icon)
     expect(screen.getByText('San Francisco, CA')).toBeInTheDocument()
   })
 
-  it('shows employment type and work arrangement badges', () => {
+  it('shows company icon', () => {
     render(<JobCard job={mockJob} isActive={false} />, {
       wrapper: createWrapper(),
     })
 
-    expect(screen.getByText('Full-time')).toBeInTheDocument()
-    expect(screen.getByText('Remote')).toBeInTheDocument()
+    // Check for the building emoji
+    expect(screen.getByText('🏢')).toBeInTheDocument()
+  })
+
+  it('shows location, work arrangement and employment type icons', () => {
+    render(<JobCard job={mockJob} isActive={false} />, {
+      wrapper: createWrapper(),
+    })
+
+    // Check for icons
+    expect(screen.getByText('📍')).toBeInTheDocument() // Location
+    expect(screen.getByText('🏠')).toBeInTheDocument() // Work arrangement
+    expect(screen.getByText('💼')).toBeInTheDocument() // Employment type
   })
 
   it('shows job description preview', () => {
