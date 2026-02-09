@@ -43,10 +43,10 @@ export async function fetchJobs(params: {
 
   if (params.page) searchParams.append('page', params.page.toString())
   if (params.limit) searchParams.append('limit', params.limit.toString())
-  if (params.keyword) searchParams.append('q', params.keyword) // Backend uses 'q'
+  if (params.keyword) searchParams.append('keyword', params.keyword)
   if (params.location) searchParams.append('location', params.location)
-  if (params.employmentType) searchParams.append('employment_type', params.employmentType) // Backend uses snake_case
-  if (params.workArrangement) searchParams.append('work_arrangement', params.workArrangement) // Backend uses snake_case
+  if (params.employmentType) searchParams.append('employmentType', params.employmentType)
+  if (params.workArrangement) searchParams.append('workArrangement', params.workArrangement)
 
   const queryString = searchParams.toString()
   const endpoint = `/api/jobs${queryString ? `?${queryString}` : ''}`
