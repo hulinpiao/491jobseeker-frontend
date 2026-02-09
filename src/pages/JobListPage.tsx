@@ -39,7 +39,7 @@ export function JobListPage() {
           </div>
 
           {/* Job List */}
-          <JobList filters={filters} selectedJobId={null} onSelectJob={() => {}} />
+          <JobList filters={filters} />
         </div>
       </main>
     </div>

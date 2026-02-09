@@ -8,11 +8,10 @@ import { normalizeJob } from '@/types/job'
 
 interface JobListProps {
   filters: JobFilters
-  selectedJobId: string | null
-  onSelectJob: (job: Job) => void
+  selectedJobId?: string | null
 }
 
-export function JobList({ filters, selectedJobId, onSelectJob }: JobListProps) {
+export function JobList({ filters, selectedJobId }: JobListProps) {
   const [page, setPage] = useState(1)
   const limit = 10
 
@@ -39,47 +38,46 @@ export function JobList({ filters, selectedJobId, onSelectJob }: JobListProps) {
 
   if (isLoading) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <p className="text-muted-foreground">加载中...</p>
+      <div className="flex min-h-[200px] items-center justify-center">
+        <p className="text-muted-foreground">Loading...</p>
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <p className="text-destructive">加载失败，请稍后重试</p>
+      <div className="flex min-h-[200px] items-center justify-center">
+        <p className="text-destructive">Failed to load jobs. Please try again.</p>
       </div>
     )
   }
 
   if (jobs.length === 0) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <p className="text-muted-foreground">没有找到匹配的职位</p>
+      <div className="flex min-h-[200px] items-center justify-center">
+        <p className="text-muted-foreground">No jobs found matching your criteria</p>
       </div>
     )
   }
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex flex-col">
       <div className="mb-4 text-sm text-muted-foreground">
-        共 {total} 个职位
+        {total} {total === 1 ? 'job' : 'jobs'} found
       </div>
 
-      <div className="flex-1 space-y-3 overflow-y-auto">
+      <div className="space-y-4">
         {jobs.map((job) => (
           <JobCard
             key={job.id}
             job={job}
             isActive={selectedJobId === job.id}
-            onClick={() => onSelectJob(job)}
           />
         ))}
       </div>
 
       {totalPages > 1 && (
-        <div className="mt-4 flex justify-center">
+        <div className="mt-6 flex justify-center">
           <Pagination
             currentPage={page}
             totalPages={totalPages}
