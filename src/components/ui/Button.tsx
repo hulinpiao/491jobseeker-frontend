@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils'
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'default' | 'ghost' | 'outline'
+  variant?: 'default' | 'ghost' | 'outline' | 'secondary'
   size?: 'sm' | 'md' | 'lg'
   asChild?: boolean
   href?: string
@@ -27,6 +27,7 @@ export function Button({
             'bg-primary text-primary-foreground hover:bg-primary/90': variant === 'default',
             'hover:bg-accent hover:text-accent-foreground': variant === 'ghost',
             'border border-input bg-background hover:bg-accent hover:text-accent-foreground': variant === 'outline',
+            'bg-secondary text-secondary-foreground hover:bg-secondary/80': variant === 'secondary',
             'h-9 px-4 py-2 text-sm': size === 'sm',
             'h-10 px-6 py-2': size === 'md',
             'h-11 px-8 py-3 text-lg': size === 'lg',
@@ -48,6 +49,7 @@ export function Button({
           'bg-primary text-primary-foreground hover:bg-primary/90': variant === 'default',
           'hover:bg-accent hover:text-accent-foreground': variant === 'ghost',
           'border border-input bg-background hover:bg-accent hover:text-accent-foreground': variant === 'outline',
+          'bg-secondary text-secondary-foreground hover:bg-secondary/80': variant === 'secondary',
           'h-9 px-4 py-2 text-sm': size === 'sm',
           'h-10 px-6 py-2': size === 'md',
           'h-11 px-8 py-3 text-lg': size === 'lg',

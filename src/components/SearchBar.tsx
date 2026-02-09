@@ -9,7 +9,7 @@ interface SearchBarProps {
   placeholder?: string
 }
 
-export function SearchBar({ value, onChange, onSearch, placeholder = '搜索职位、公司...' }: SearchBarProps) {
+export function SearchBar({ value, onChange, onSearch, placeholder = 'Search jobs, companies...' }: SearchBarProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     onSearch()
@@ -25,9 +25,10 @@ export function SearchBar({ value, onChange, onSearch, placeholder = '搜索职�
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           className="pl-10"
+          data-testid="search-input"
         />
       </div>
-      <Button type="submit">搜索</Button>
+      <Button type="submit">Search</Button>
     </form>
   )
 }

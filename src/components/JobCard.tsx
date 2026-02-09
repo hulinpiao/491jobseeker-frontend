@@ -1,61 +1,77 @@
-import { MapPin, Briefcase, Clock } from 'lucide-react'
-import { Badge } from './ui/Badge'
-import { Card, CardHeader, CardContent } from './ui/Card'
+import { Link } from 'react-router-dom'
+import { Clock, Building } from 'lucide-react'
+import { Card } from './ui/Card'
 import { formatDate } from '@/lib/utils'
 import type { Job } from '@/types/job'
 
 interface JobCardProps {
   job: Job
-  isActive: boolean
-  onClick: () => void
+  isActive?: boolean
 }
 
 const EMPLOYMENT_TYPE_LABELS: Record<string, string> = {
-  full_time: '全职',
-  part_time: '兼职',
-  contract: '合同工',
-  casual: '临时',
-  temporary: '临时',
+  full_time: 'Full-time',
+  part_time: 'Part-time',
+  contract: 'Contract',
+  casual: 'Casual',
+  temporary: 'Temporary',
 } as const
 
 const WORK_ARRANGEMENT_LABELS: Record<string, string> = {
-  onsite: '现场',
-  hybrid: '混合',
-  remote: '远程',
+  onsite: 'On-site',
+  hybrid: 'Hybrid',
+  remote: 'Remote',
 } as const
 
-export function JobCard({ job, isActive, onClick }: JobCardProps) {
+export function JobCard({ job, isActive = false }: JobCardProps) {
   return (
     <Card
-      className={`cursor-pointer transition-colors hover:bg-accent/50 ${
+      className={`hover:shadow-lg transition-all cursor-pointer ${
         isActive ? 'border-primary bg-accent' : ''
       }`}
-      onClick={onClick}
     >
-      <CardHeader className="pb-3">
-        <h3 className="line-clamp-1 font-semibold">{job.title}</h3>
-        <p className="text-sm text-muted-foreground">{job.company}</p>
-      </CardHeader>
-      <CardContent className="space-y-2">
-        <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
-          <span className="flex items-center gap-1">
-            <MapPin className="h-3.5 w-3.5" />
-            {job.city}, {job.state}
-          </span>
-          <span className="flex items-center gap-1">
-            <Briefcase className="h-3.5 w-3.5" />
-            {EMPLOYMENT_TYPE_LABELS[job.employmentType]}
-          </span>
-          <Badge variant="outline" className="text-xs">
-            {WORK_ARRANGEMENT_LABELS[job.workArrangement]}
-          </Badge>
+      <Link to={`/jobs/${job.id}`} className="block p-4" data-testid="job-card" data-job-id={job.id}>
+        {/* Job Title with Company Icon on Right */}
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="text-xl font-bold line-clamp-1 flex-1">{job.title}</h3>
+          <div className="flex items-center gap-1 text-sm text-muted-foreground shrink-0" title={`Company: ${job.company}`}>
+            <Building className="h-4 w-4" />
+            <span className="hidden sm:inline">{job.company}</span>
+          </div>
         </div>
 
-        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-          <Clock className="h-3 w-3" />
-          <span>{formatDate(job.createdAt)}</span>
+        {/* JD Preview */}
+        <p className="mt-3 text-gray-600 dark:text-gray-400 line-clamp-3 text-sm">
+          {job.description}
+        </p>
+
+        {/* Bottom Bar: Posted Date + Info with Icons */}
+        <div className="flex items-center justify-between mt-3 flex-wrap gap-2">
+          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <Clock className="h-3 w-3" />
+            <span>Posted {formatDate(job.createdAt)}</span>
+          </div>
+          <div className="flex items-center gap-3 text-xs">
+            {/* Location - always show */}
+            <div className="flex items-center gap-1" title={`Location: ${job.location}`}>
+              <span>📍</span>
+              <span>{job.location}</span>
+            </div>
+            {/* Work Arrangement - only show if value exists */}
+            {job.workArrangement && WORK_ARRANGEMENT_LABELS[job.workArrangement] && (
+              <div className="flex items-center gap-1" title={`Work Arrangement: ${WORK_ARRANGEMENT_LABELS[job.workArrangement]}`}>
+                <span>🏠</span>
+                <span>{WORK_ARRANGEMENT_LABELS[job.workArrangement]}</span>
+              </div>
+            )}
+            {/* Employment Type - always show */}
+            <div className="flex items-center gap-1" title={`Employment Type: ${EMPLOYMENT_TYPE_LABELS[job.employmentType]}`}>
+              <span>💼</span>
+              <span>{EMPLOYMENT_TYPE_LABELS[job.employmentType]}</span>
+            </div>
+          </div>
         </div>
-      </CardContent>
+      </Link>
     </Card>
   )
 }

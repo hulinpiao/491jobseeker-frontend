@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { MemoryRouter } from 'react-router-dom'
 import { JobList } from './JobList'
 import type { JobFilters } from '@/types/job'
 
@@ -47,7 +48,9 @@ function createWrapper() {
   })
 
   return ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter>{children}</MemoryRouter>
+    </QueryClientProvider>
   )
 }
 
@@ -55,13 +58,13 @@ const mockJobsResponse = {
   data: [
     {
       _id: '1',
-      job_title: '前端工程师',
-      company_name_normalized: 'Test Company',
-      city: '北京',
-      state: '北京',
-      country: '中国',
-      job_location: '北京, 中国',
-      job_description: 'Test description',
+      job_title: 'Frontend Engineer',
+      company_name_normalized: 'TechCorp',
+      city: 'San Francisco',
+      state: 'CA',
+      country: 'USA',
+      job_location: 'San Francisco, CA',
+      job_description: 'Build modern web applications',
       employment_type: 'full_time' as const,
       work_arrangement: 'remote' as const,
       apply_link: 'https://example.com',
@@ -71,13 +74,13 @@ const mockJobsResponse = {
     },
     {
       _id: '2',
-      job_title: '后端工程师',
-      company_name_normalized: 'Another Company',
-      city: '上海',
-      state: '上海',
-      country: '中国',
-      job_location: '上海, 中国',
-      job_description: 'Another description',
+      job_title: 'Backend Engineer',
+      company_name_normalized: 'DataFlow',
+      city: 'New York',
+      state: 'NY',
+      country: 'USA',
+      job_location: 'New York, NY',
+      job_description: 'Build scalable APIs',
       employment_type: 'full_time' as const,
       work_arrangement: 'onsite' as const,
       apply_link: 'https://example.com/2',
@@ -97,29 +100,29 @@ describe('JobList', () => {
     vi.clearAllMocks()
   })
 
-  it('应该显示加载状态', () => {
+  it('displays loading state', () => {
     vi.mocked(fetchJobs).mockImplementation(() => new Promise(() => {})) // Never resolves
 
-    render(<JobList filters={{}} selectedJobId={null} onSelectJob={vi.fn()} />, {
+    render(<JobList filters={{}} />, {
       wrapper: createWrapper(),
     })
 
-    expect(screen.getByText('加载中...')).toBeInTheDocument()
+    expect(screen.getByText('Loading...')).toBeInTheDocument()
   })
 
-  it('应该显示错误状态', async () => {
+  it('displays error state', async () => {
     vi.mocked(fetchJobs).mockRejectedValueOnce(new Error('API Error'))
 
-    render(<JobList filters={{}} selectedJobId={null} onSelectJob={vi.fn()} />, {
+    render(<JobList filters={{}} />, {
       wrapper: createWrapper(),
     })
 
     await waitFor(() => {
-      expect(screen.getByText('加载失败，请稍后重试')).toBeInTheDocument()
+      expect(screen.getByText('Failed to load jobs. Please try again.')).toBeInTheDocument()
     })
   })
 
-  it('应该显示空状态', async () => {
+  it('displays empty state', async () => {
     vi.mocked(fetchJobs).mockResolvedValueOnce({
       data: [],
       total: 0,
@@ -128,40 +131,40 @@ describe('JobList', () => {
       totalPages: 1,
     })
 
-    render(<JobList filters={{}} selectedJobId={null} onSelectJob={vi.fn()} />, {
+    render(<JobList filters={{}} />, {
       wrapper: createWrapper(),
     })
 
     await waitFor(() => {
-      expect(screen.getByText('没有找到匹配的职位')).toBeInTheDocument()
+      expect(screen.getByText('No jobs found matching your criteria')).toBeInTheDocument()
     })
   })
 
-  it('应该显示职位列表', async () => {
+  it('displays job list', async () => {
     vi.mocked(fetchJobs).mockResolvedValueOnce(mockJobsResponse)
 
-    render(<JobList filters={{}} selectedJobId={null} onSelectJob={vi.fn()} />, {
+    render(<JobList filters={{}} />, {
       wrapper: createWrapper(),
     })
 
     await waitFor(() => {
-      expect(screen.getByText('共 2 个职位')).toBeInTheDocument()
-      expect(screen.getByText('前端工程师')).toBeInTheDocument()
-      expect(screen.getByText('后端工程师')).toBeInTheDocument()
+      expect(screen.getByText('2 jobs found')).toBeInTheDocument()
+      expect(screen.getByText('Frontend Engineer')).toBeInTheDocument()
+      expect(screen.getByText('Backend Engineer')).toBeInTheDocument()
     })
   })
 
-  it('应该调用 fetchJobs 并传递筛选条件', async () => {
+  it('calls fetchJobs with filters', async () => {
     vi.mocked(fetchJobs).mockResolvedValueOnce(mockJobsResponse)
 
     const filters: JobFilters = {
-      keyword: '前端',
-      location: '北京',
+      keyword: 'frontend',
+      location: 'San Francisco',
       employmentType: 'full_time',
       workArrangement: 'remote',
     }
 
-    render(<JobList filters={filters} selectedJobId={null} onSelectJob={vi.fn()} />, {
+    render(<JobList filters={filters} />, {
       wrapper: createWrapper(),
     })
 
@@ -169,45 +172,21 @@ describe('JobList', () => {
       expect(fetchJobs).toHaveBeenCalledWith({
         page: 1,
         limit: 10,
-        keyword: '前端',
-        location: '北京',
+        keyword: 'frontend',
+        location: 'San Francisco',
         employmentType: 'full_time',
         workArrangement: 'remote',
       })
     })
   })
 
-  it('应该支持选择职位', async () => {
-    vi.mocked(fetchJobs).mockResolvedValueOnce(mockJobsResponse)
-
-    const onSelectJob = vi.fn()
-
-    render(<JobList filters={{}} selectedJobId={null} onSelectJob={onSelectJob} />, {
-      wrapper: createWrapper(),
-    })
-
-    await waitFor(() => {
-      expect(screen.getByText('前端工程师')).toBeInTheDocument()
-    })
-
-    // Click on the first job card
-    const jobCard = screen.getByText('前端工程师').closest('.cursor-pointer')
-    if (jobCard) {
-      jobCard.click()
-    }
-
-    await waitFor(() => {
-      expect(onSelectJob).toHaveBeenCalled()
-    })
-  })
-
-  it('应该显示分页组件', async () => {
+  it('displays pagination when multiple pages', async () => {
     vi.mocked(fetchJobs).mockResolvedValueOnce({
       ...mockJobsResponse,
       totalPages: 3,
     })
 
-    const { container } = render(<JobList filters={{}} selectedJobId={null} onSelectJob={vi.fn()} />, {
+    const { container } = render(<JobList filters={{}} />, {
       wrapper: createWrapper(),
     })
 
@@ -216,13 +195,13 @@ describe('JobList', () => {
     })
   })
 
-  it('不应该显示分页当只有一页', async () => {
+  it('does not display pagination when only one page', async () => {
     vi.mocked(fetchJobs).mockResolvedValueOnce({
       ...mockJobsResponse,
       totalPages: 1,
     })
 
-    render(<JobList filters={{}} selectedJobId={null} onSelectJob={vi.fn()} />, {
+    render(<JobList filters={{}} />, {
       wrapper: createWrapper(),
     })
 
