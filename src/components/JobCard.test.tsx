@@ -9,13 +9,18 @@ const mockJob: Job = {
   title: '高级前端工程师',
   company: 'ByteDance',
   location: '北京',
-  salary: { min: 35000, max: 55000, currency: 'CNY', period: 'month' },
-  type: 'full-time',
-  status: 'active',
+  city: '北京',
+  state: '北京',
+  country: '中国',
   description: '负责抖音核心业务的前端开发',
-  requirements: ['5年以上前端经验', '精通 React'],
-  postedAt: new Date().toISOString(),
-  source: 'boss',
+  employmentType: 'full_time',
+  workArrangement: 'remote',
+  applyLink: 'https://example.com/apply',
+  sources: [
+    { platform: 'boss', jobId: '123', url: 'https://boss.com/job/123' },
+  ],
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
 }
 
 describe('JobCard', () => {
@@ -24,14 +29,17 @@ describe('JobCard', () => {
 
     expect(screen.getByText('高级前端工程师')).toBeInTheDocument()
     expect(screen.getByText('ByteDance')).toBeInTheDocument()
-    expect(screen.getByText('北京')).toBeInTheDocument()
-    expect(screen.getByText(/CNY 35,000/)).toBeInTheDocument()
+    // Use function matcher for text split across elements
+    expect(screen.getByText((_content, element) => {
+      return element?.textContent === '北京, 北京'
+    })).toBeInTheDocument()
   })
 
-  it('shows status badge', () => {
+  it('shows employment type and work arrangement', () => {
     render(<JobCard job={mockJob} isActive={false} onClick={() => {}} />)
 
-    expect(screen.getByText('待申请')).toBeInTheDocument()
+    expect(screen.getByText('全职')).toBeInTheDocument()
+    expect(screen.getByText('远程')).toBeInTheDocument()
   })
 
   it('applies active styling when selected', () => {

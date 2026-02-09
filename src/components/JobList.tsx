@@ -1,9 +1,10 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { JobCard } from './JobCard'
 import { Pagination } from './Pagination'
 import type { Job, JobFilters } from '@/types/job'
-import { fetchJobs } from '@/mock-data/jobs'
+import { fetchJobs as apiFetchJobs } from '@/services/api'
+import { normalizeJob } from '@/types/job'
 
 interface JobListProps {
   filters: JobFilters
@@ -20,47 +21,21 @@ export function JobList({ filters, selectedJobId, onSelectJob }: JobListProps) {
 
   const { data, isLoading, error } = useQuery({
     queryKey,
-    queryFn: () => fetchJobs(page, limit),
+    queryFn: () =>
+      apiFetchJobs({
+        page,
+        limit,
+        keyword: filters.keyword,
+        location: filters.location,
+        employmentType: filters.employmentType,
+        workArrangement: filters.workArrangement,
+      }),
   })
 
-  // Apply client-side filtering for demo
-  // In production, this would be handled by the API
-  const filteredJobs = useMemo(() => {
-    if (!data) return []
-
-    return data.jobs.filter((job) => {
-      if (filters.keyword && !job.title.toLowerCase().includes(filters.keyword.toLowerCase()) &&
-          !job.company.toLowerCase().includes(filters.keyword.toLowerCase())) {
-        return false
-      }
-      if (filters.location && !job.location.includes(filters.location)) {
-        return false
-      }
-      if (filters.type && job.type !== filters.type) {
-        return false
-      }
-      if (filters.status && job.status !== filters.status) {
-        return false
-      }
-      if (filters.minSalary) {
-        const salaryInYear = job.salary.period === 'month'
-          ? (job.salary.min || 0) * 12
-          : (job.salary.min || 0)
-        if (salaryInYear < filters.minSalary) {
-          return false
-        }
-      }
-      return true
-    })
-  }, [data, filters])
-
-  // Reset to first page when filters change
-  useEffect(() => {
-    setPage(1)
-  }, [filters.keyword, filters.location, filters.type, filters.status, filters.minSalary])
-
-  const totalPages = Math.ceil((filteredJobs.length) / limit)
-  const displayedJobs = filteredJobs.slice((page - 1) * limit, page * limit)
+  // Normalize API jobs to frontend Jobs
+  const jobs: Job[] = data?.data.map(normalizeJob) ?? []
+  const total = data?.total ?? 0
+  const totalPages = data?.totalPages ?? 1
 
   if (isLoading) {
     return (
@@ -78,7 +53,7 @@ export function JobList({ filters, selectedJobId, onSelectJob }: JobListProps) {
     )
   }
 
-  if (displayedJobs.length === 0) {
+  if (jobs.length === 0) {
     return (
       <div className="flex h-full items-center justify-center">
         <p className="text-muted-foreground">没有找到匹配的职位</p>
@@ -89,11 +64,11 @@ export function JobList({ filters, selectedJobId, onSelectJob }: JobListProps) {
   return (
     <div className="flex h-full flex-col">
       <div className="mb-4 text-sm text-muted-foreground">
-        共 {filteredJobs.length} 个职位
+        共 {total} 个职位
       </div>
 
       <div className="flex-1 space-y-3 overflow-y-auto">
-        {displayedJobs.map((job) => (
+        {jobs.map((job) => (
           <JobCard
             key={job.id}
             job={job}

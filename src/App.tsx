@@ -33,15 +33,15 @@ function App() {
       </header>
 
       {/* Main Content */}
-      <main className="mx-auto max-w-7xl flex-1 px-6 py-6">
-        <div className="grid grid-cols-12 gap-6 h-[calc(100vh-180px)]">
+      <main className="mx-auto max-w-7xl flex-1 px-4 py-4 md:px-6 md:py-6">
+        <div className="grid grid-cols-1 gap-4 h-[calc(100vh-140px)] md:grid-cols-12 md:gap-6 md:h-[calc(100vh-180px)]">
           {/* Left Sidebar - Filters */}
-          <aside className="col-span-3 overflow-y-auto">
+          <aside className="hidden md:block md:col-span-3 overflow-y-auto">
             <FilterPanel filters={filters} onChange={setFilters} />
           </aside>
 
           {/* Middle - Job List */}
-          <section className="col-span-4 overflow-hidden">
+          <section className="col-span-1 overflow-hidden md:col-span-4">
             <JobList
               filters={filters}
               selectedJobId={selectedJob?.id ?? null}
@@ -50,7 +50,7 @@ function App() {
           </section>
 
           {/* Right - Job Detail */}
-          <section className="col-span-5 overflow-hidden">
+          <section className="hidden md:block md:col-span-5 overflow-hidden">
             <JobDetail job={selectedJob} />
           </section>
         </div>
