@@ -17,7 +17,7 @@ export function JobListPage() {
   }
 
   return (
-    <div className="flex h-screen flex-col bg-background">
+    <div className="flex min-h-screen flex-col bg-background">
       {/* Header */}
       <header className="border-b bg-card px-6 py-4">
         <div className="mx-auto max-w-7xl">
@@ -30,18 +30,16 @@ export function JobListPage() {
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="mx-auto max-w-7xl flex-1 px-4 py-4 md:px-6 md:py-6">
-        <div className="flex flex-col gap-4 h-[calc(100vh-140px)] md:h-[calc(100vh-180px)]">
+      {/* Main Content - Vertical Stack Layout */}
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-4 md:px-6 md:py-6">
+        <div className="flex flex-col gap-4">
           {/* Filters - shown on desktop */}
-          <div className="hidden md:block overflow-y-auto">
+          <div className="hidden md:block">
             <FilterPanel filters={filters} onChange={setFilters} />
           </div>
 
           {/* Job List */}
-          <div className="flex-1 overflow-hidden">
-            <JobList filters={filters} selectedJobId={null} onSelectJob={() => {}} />
-          </div>
+          <JobList filters={filters} selectedJobId={null} onSelectJob={() => {}} />
         </div>
       </main>
     </div>
