@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { JobCard } from './JobCard'
 import { Pagination } from './Pagination'
@@ -8,15 +8,16 @@ import { normalizeJob } from '@/types/job'
 
 interface JobListProps {
   filters: JobFilters
+  page?: number
+  onPageChange?: (page: number) => void
   selectedJobId?: string | null
 }
 
-export function JobList({ filters, selectedJobId }: JobListProps) {
-  const [page, setPage] = useState(1)
+export function JobList({ filters, page = 1, onPageChange, selectedJobId }: JobListProps) {
   const limit = 10
 
-  // Build query key from filters
-  const queryKey = ['jobs', filters, page]
+  // Build query key from filters and page
+  const queryKey = useMemo(() => ['jobs', filters, page], [filters, page])
 
   const { data, isLoading, error } = useQuery({
     queryKey,
@@ -76,12 +77,12 @@ export function JobList({ filters, selectedJobId }: JobListProps) {
         ))}
       </div>
 
-      {totalPages > 1 && (
+      {totalPages > 1 && onPageChange && (
         <div className="mt-6 flex justify-center">
           <Pagination
             currentPage={page}
             totalPages={totalPages}
-            onPageChange={setPage}
+            onPageChange={onPageChange}
           />
         </div>
       )}

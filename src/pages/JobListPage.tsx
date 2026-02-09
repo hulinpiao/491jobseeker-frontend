@@ -1,11 +1,30 @@
-import { useState } from 'react'
+import { useMemo } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { SearchBar } from '../components/SearchBar'
 import { FilterPanel } from '../components/FilterPanel'
 import { JobList } from '../components/JobList'
-import type { JobFilters } from '../types/job'
+import type { JobFilters, EmploymentType, WorkArrangement } from '../types/job'
 
 export function JobListPage() {
-  const [filters, setFilters] = useState<JobFilters>({})
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  // Read filters from URL params
+  const filters: JobFilters = useMemo(() => {
+    const keyword = searchParams.get('keyword') || undefined
+    const location = searchParams.get('location') || undefined
+    const employmentType = (searchParams.get('employmentType') as EmploymentType) || undefined
+    const workArrangement = (searchParams.get('workArrangement') as WorkArrangement) || undefined
+
+    return {
+      ...(keyword && { keyword }),
+      ...(location && { location }),
+      ...(employmentType && { employmentType }),
+      ...(workArrangement && { workArrangement }),
+    }
+  }, [searchParams])
+
+  // Read page from URL params
+  const page = parseInt(searchParams.get('page') || '1', 10)
 
   const handleSearch = () => {
     // Search is triggered by filter changes in JobList
@@ -13,7 +32,54 @@ export function JobListPage() {
   }
 
   const handleKeywordChange = (keyword: string) => {
-    setFilters((prev) => ({ ...prev, keyword: keyword || undefined }))
+    const newParams = new URLSearchParams(searchParams)
+    if (keyword) {
+      newParams.set('keyword', keyword)
+    } else {
+      newParams.delete('keyword')
+    }
+    setSearchParams(newParams)
+  }
+
+  const handleFilterChange = (newFilters: JobFilters) => {
+    const newParams = new URLSearchParams(searchParams)
+
+    // Update params based on new filters
+    if (newFilters.keyword) {
+      newParams.set('keyword', newFilters.keyword)
+    } else {
+      newParams.delete('keyword')
+    }
+
+    if (newFilters.location) {
+      newParams.set('location', newFilters.location)
+    } else {
+      newParams.delete('location')
+    }
+
+    if (newFilters.employmentType) {
+      newParams.set('employmentType', newFilters.employmentType)
+    } else {
+      newParams.delete('employmentType')
+    }
+
+    if (newFilters.workArrangement) {
+      newParams.set('workArrangement', newFilters.workArrangement)
+    } else {
+      newParams.delete('workArrangement')
+    }
+
+    setSearchParams(newParams)
+  }
+
+  const handlePageChange = (newPage: number) => {
+    const newParams = new URLSearchParams(searchParams)
+    if (newPage > 1) {
+      newParams.set('page', newPage.toString())
+    } else {
+      newParams.delete('page')
+    }
+    setSearchParams(newParams)
   }
 
   return (
@@ -35,11 +101,11 @@ export function JobListPage() {
         <div className="flex flex-col gap-4">
           {/* Filters - shown on desktop */}
           <div className="hidden md:block">
-            <FilterPanel filters={filters} onChange={setFilters} />
+            <FilterPanel filters={filters} onChange={handleFilterChange} />
           </div>
 
           {/* Job List */}
-          <JobList filters={filters} />
+          <JobList filters={filters} page={page} onPageChange={handlePageChange} />
         </div>
       </main>
     </div>
