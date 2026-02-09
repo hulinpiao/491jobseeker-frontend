@@ -1,12 +1,16 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { SearchBar } from '../components/SearchBar'
 import { FilterPanel } from '../components/FilterPanel'
+import { FilterToggle } from '../components/FilterToggle'
 import { JobList } from '../components/JobList'
+import { useMediaQuery } from '../hooks/useMediaQuery'
 import type { JobFilters, EmploymentType, WorkArrangement } from '../types/job'
 
 export function JobListPage() {
   const [searchParams, setSearchParams] = useSearchParams()
+  const [showMobileFilter, setShowMobileFilter] = useState(false)
+  const isDesktop = useMediaQuery('(min-width: 768px)')
 
   // Read filters from URL params
   const filters: JobFilters = useMemo(() => {
@@ -22,6 +26,9 @@ export function JobListPage() {
       ...(workArrangement && { workArrangement }),
     }
   }, [searchParams])
+
+  // Count active filters for the badge
+  const activeFilterCount = Object.keys(filters).length
 
   // Read page from URL params
   const page = parseInt(searchParams.get('page') || '1', 10)
@@ -82,6 +89,9 @@ export function JobListPage() {
     setSearchParams(newParams)
   }
 
+  // Show filter panel on desktop or when toggled on mobile
+  const showFilterPanel = isDesktop || showMobileFilter
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
       {/* Header */}
@@ -99,10 +109,19 @@ export function JobListPage() {
       {/* Main Content - Vertical Stack Layout */}
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-4 md:px-6 md:py-6">
         <div className="flex flex-col gap-4">
-          {/* Filters - shown on desktop */}
-          <div className="hidden md:block">
-            <FilterPanel filters={filters} onChange={handleFilterChange} />
-          </div>
+          {/* Mobile Filter Toggle - hidden on desktop */}
+          <FilterToggle
+            show={showMobileFilter}
+            onToggle={() => setShowMobileFilter(!showMobileFilter)}
+            count={activeFilterCount}
+          />
+
+          {/* Filters - shown on desktop or when toggled on mobile */}
+          {showFilterPanel && (
+            <div className="overflow-hidden transition-all duration-300 ease-in-out">
+              <FilterPanel filters={filters} onChange={handleFilterChange} />
+            </div>
+          )}
 
           {/* Job List */}
           <JobList filters={filters} page={page} onPageChange={handlePageChange} />
