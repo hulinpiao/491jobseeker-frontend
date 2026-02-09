@@ -13,6 +13,7 @@ export function FilterToggle({ show, onToggle, count = 0 }: FilterToggleProps) {
       className="md:hidden w-full flex items-center justify-between gap-2 py-3 px-4 bg-card border rounded-lg hover:bg-accent transition-colors"
       aria-expanded={show}
       aria-label="Toggle filters"
+      data-testid="filter-toggle"
     >
       <div className="flex items-center gap-2">
         <Filter className="h-4 w-4" />

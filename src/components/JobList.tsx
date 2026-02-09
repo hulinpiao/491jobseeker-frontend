@@ -62,7 +62,7 @@ export function JobList({ filters, page = 1, onPageChange, selectedJobId }: JobL
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col" data-testid="job-list">
       <div className="mb-4 text-sm text-muted-foreground">
         {total} {total === 1 ? 'job' : 'jobs'} found
       </div>

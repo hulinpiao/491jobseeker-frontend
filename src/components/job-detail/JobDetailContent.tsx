@@ -34,7 +34,7 @@ export function JobDetailContent({ job }: JobDetailContentProps) {
       </header>
 
       {/* Main Content */}
-      <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-6 md:px-6 md:py-8">
+      <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-6 md:px-6 md:py-8" data-testid="job-detail">
         {/* Back Button */}
         <div className="mb-6">
           <BackButton />

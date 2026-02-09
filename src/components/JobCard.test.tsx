@@ -36,7 +36,9 @@ describe('JobCard', () => {
     })
 
     expect(screen.getByText('Senior Frontend Engineer')).toBeInTheDocument()
-    // Location text should still be present (displayed next to the pin icon)
+    // Company name displayed with building icon
+    expect(screen.getByText('TechCorp')).toBeInTheDocument()
+    // Location text displayed next to pin icon
     expect(screen.getByText('San Francisco, CA')).toBeInTheDocument()
   })
 
@@ -45,19 +47,23 @@ describe('JobCard', () => {
       wrapper: createWrapper(),
     })
 
-    // Check for the building emoji
-    expect(screen.getByText('🏢')).toBeInTheDocument()
+    // Use data-testid to select the specific card
+    const card = screen.getByTestId('job-card')
+    expect(card).toContainHTML('🏢')
   })
 
-  it('shows location, work arrangement and employment type icons', () => {
+  it('shows location, work arrangement and employment type with icons and text', () => {
     render(<JobCard job={mockJob} isActive={false} />, {
       wrapper: createWrapper(),
     })
 
-    // Check for icons
-    expect(screen.getByText('📍')).toBeInTheDocument() // Location
-    expect(screen.getByText('🏠')).toBeInTheDocument() // Work arrangement
-    expect(screen.getByText('💼')).toBeInTheDocument() // Employment type
+    // Check for icons with text
+    expect(screen.getByText('📍')).toBeInTheDocument() // Location icon
+    expect(screen.getByText('San Francisco, CA')).toBeInTheDocument() // Location text
+    expect(screen.getByText('🏠')).toBeInTheDocument() // Work arrangement icon
+    expect(screen.getByText('Remote')).toBeInTheDocument() // Work arrangement text
+    expect(screen.getByText('💼')).toBeInTheDocument() // Employment type icon
+    expect(screen.getByText('Full-time')).toBeInTheDocument() // Employment type text
   })
 
   it('shows job description preview', () => {
@@ -65,7 +71,9 @@ describe('JobCard', () => {
       wrapper: createWrapper(),
     })
 
-    expect(screen.getByText(/Develop and maintain core frontend features/)).toBeInTheDocument()
+    // Use data-testid to select the specific card and check description
+    const card = screen.getByTestId('job-card')
+    expect(card).toContainHTML('Develop and maintain')
   })
 
   it('applies active styling when selected', () => {

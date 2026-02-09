@@ -44,22 +44,35 @@ export function JobCard({ job, isActive = false }: JobCardProps) {
           {job.description}
         </p>
 
-        {/* Bottom Bar: Posted Date + Icons */}
-        <div className="flex items-center justify-between mt-3">
+        {/* Company Info Bar with Icons */}
+        <div className="mt-2 flex items-center gap-1 text-sm" title={`Company: ${job.company}`}>
+          <span>🏢</span>
+          <span className="text-muted-foreground">{job.company}</span>
+        </div>
+
+        {/* JD Preview */}
+        <p className="mt-3 text-gray-600 dark:text-gray-400 line-clamp-3 text-sm">
+          {job.description}
+        </p>
+
+        {/* Bottom Bar: Posted Date + Info with Icons */}
+        <div className="flex items-center justify-between mt-3 flex-wrap gap-2">
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
             <Clock className="h-3 w-3" />
             <span>Posted {formatDate(job.createdAt)}</span>
           </div>
-          <div className="flex items-center gap-3 text-sm">
+          <div className="flex items-center gap-3 text-xs">
             <div className="flex items-center gap-1" title={`Location: ${job.location}`}>
               <span>📍</span>
-              <span className="text-xs">{job.location}</span>
+              <span>{job.location}</span>
             </div>
             <div className="flex items-center gap-1" title={`Work Arrangement: ${WORK_ARRANGEMENT_LABELS[job.workArrangement]}`}>
               <span>🏠</span>
+              <span>{WORK_ARRANGEMENT_LABELS[job.workArrangement]}</span>
             </div>
             <div className="flex items-center gap-1" title={`Employment Type: ${EMPLOYMENT_TYPE_LABELS[job.employmentType]}`}>
               <span>💼</span>
+              <span>{EMPLOYMENT_TYPE_LABELS[job.employmentType]}</span>
             </div>
           </div>
         </div>
