@@ -23,12 +23,10 @@ export interface ApiJob {
 
 export interface ApiJobsResponse {
   data: ApiJob[]
-  meta: {
-    total: number
-    page: number
-    limit: number
-    totalPages: number
-  }
+  total: number
+  page: number
+  limit: number
+  totalPages: number
 }
 
 // Normalized types for frontend use

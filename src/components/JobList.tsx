@@ -34,8 +34,8 @@ export function JobList({ filters, selectedJobId, onSelectJob }: JobListProps) {
 
   // Normalize API jobs to frontend Jobs
   const jobs: Job[] = data?.data.map(normalizeJob) ?? []
-  const total = data?.meta.total ?? 0
-  const totalPages = data?.meta.totalPages ?? 1
+  const total = data?.total ?? 0
+  const totalPages = data?.totalPages ?? 1
 
   if (isLoading) {
     return (
