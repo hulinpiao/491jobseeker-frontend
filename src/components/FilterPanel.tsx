@@ -1,41 +1,32 @@
 import { Select } from './ui/Select'
 import { Input } from './ui/Input'
 import { Button } from './ui/Button'
-import type { Job, JobFilters } from '@/types/job'
+import type { JobFilters, EmploymentType, WorkArrangement } from '@/types/job'
 
 interface FilterPanelProps {
   filters: JobFilters
   onChange: (filters: JobFilters) => void
 }
 
-const JOB_TYPES = [
+const EMPLOYMENT_TYPES = [
   { value: '', label: '全部类型' },
-  { value: 'full-time', label: '全职' },
-  { value: 'part-time', label: '兼职' },
+  { value: 'full_time', label: '全职' },
+  { value: 'part_time', label: '兼职' },
   { value: 'contract', label: '合同工' },
-  { value: 'internship', label: '实习' },
+  { value: 'casual', label: '临时' },
+  { value: 'temporary', label: '短期' },
 ] as const
 
-const STATUSES = [
-  { value: '', label: '全部状态' },
-  { value: 'active', label: '待申请' },
-  { value: 'applied', label: '已申请' },
-  { value: 'interview', label: '面试中' },
-  { value: 'offered', label: '已录用' },
-  { value: 'rejected', label: '已拒绝' },
+const WORK_ARRANGEMENTS = [
+  { value: '', label: '全部方式' },
+  { value: 'onsite', label: '现场办公' },
+  { value: 'hybrid', label: '混合办公' },
+  { value: 'remote', label: '远程办公' },
 ] as const
 
 export function FilterPanel({ filters, onChange }: FilterPanelProps) {
-  const updateFilter = (key: keyof JobFilters, value: string | number | undefined) => {
+  const updateFilter = (key: keyof JobFilters, value: string | undefined) => {
     onChange({ ...filters, [key]: value || undefined })
-  }
-
-  const updateTypeFilter = (value: string) => {
-    onChange({ ...filters, type: (value || undefined) as Job['type'] | undefined })
-  }
-
-  const updateStatusFilter = (value: string) => {
-    onChange({ ...filters, status: (value || undefined) as Job['status'] | undefined })
   }
 
   const clearFilters = () => {
@@ -69,15 +60,15 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
         </div>
 
         <div>
-          <label htmlFor="type" className="mb-1 block text-sm font-medium">
+          <label htmlFor="employmentType" className="mb-1 block text-sm font-medium">
             工作类型
           </label>
           <Select
-            id="type"
-            value={filters.type ?? ''}
-            onChange={(e) => updateTypeFilter(e.target.value)}
+            id="employmentType"
+            value={filters.employmentType ?? ''}
+            onChange={(e) => updateFilter('employmentType', e.target.value as EmploymentType | undefined)}
           >
-            {JOB_TYPES.map((type) => (
+            {EMPLOYMENT_TYPES.map((type) => (
               <option key={type.value} value={type.value}>
                 {type.label}
               </option>
@@ -86,33 +77,20 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
         </div>
 
         <div>
-          <label htmlFor="status" className="mb-1 block text-sm font-medium">
-            申请状态
+          <label htmlFor="workArrangement" className="mb-1 block text-sm font-medium">
+            工作方式
           </label>
           <Select
-            id="status"
-            value={filters.status ?? ''}
-            onChange={(e) => updateStatusFilter(e.target.value)}
+            id="workArrangement"
+            value={filters.workArrangement ?? ''}
+            onChange={(e) => updateFilter('workArrangement', e.target.value as WorkArrangement | undefined)}
           >
-            {STATUSES.map((status) => (
-              <option key={status.value} value={status.value}>
-                {status.label}
+            {WORK_ARRANGEMENTS.map((arrangement) => (
+              <option key={arrangement.value} value={arrangement.value}>
+                {arrangement.label}
               </option>
             ))}
           </Select>
-        </div>
-
-        <div>
-          <label htmlFor="minSalary" className="mb-1 block text-sm font-medium">
-            最低月薪（元）
-          </label>
-          <Input
-            id="minSalary"
-            type="number"
-            placeholder="最低薪资..."
-            value={filters.minSalary ?? ''}
-            onChange={(e) => updateFilter('minSalary', e.target.value ? Number(e.target.value) : undefined)}
-          />
         </div>
       </div>
     </div>
