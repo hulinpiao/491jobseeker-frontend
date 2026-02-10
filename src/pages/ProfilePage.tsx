@@ -1,6 +1,6 @@
 /**
  * ProfilePage Component
- * Single Responsibility: Display and manage user profile
+ * Single Responsibility: Display and manage user profile with resume features
  */
 
 import { useState } from 'react'
@@ -11,12 +11,29 @@ import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
 import { Badge } from '@/components/ui/Badge'
+import { ResumeUploader } from '@/components/profile/ResumeUploader'
+import { ResumeDisplay } from '@/components/profile/ResumeDisplay'
+import { AIAnalysisSection } from '@/components/profile/AIAnalysisSection'
+import { JobFilterPanel } from '@/components/profile/JobFilterPanel'
+import type { AnalysisResult, JobFilters } from '@/types/resume'
 
 const VISA_TYPE_LABELS: Record<string, string> = {
   '491': 'Skilled Work Regional (Provisional) (491)',
   '494': 'Skilled Employer Sponsored Regional (Provisional) (494)',
   '482': 'Temporary Skill Shortage (482)',
   '186': 'Employer Nomination Scheme (186)',
+}
+
+interface ResumeData {
+  resumeId: string | null
+  fileName: string | null
+  uploadDate: Date | null
+}
+
+const initialResumeData: ResumeData = {
+  resumeId: null,
+  fileName: null,
+  uploadDate: null,
 }
 
 export function ProfilePage() {
@@ -31,6 +48,8 @@ export function ProfilePage() {
     linkedInUrl: user?.linkedInUrl || '',
     location: user?.location || '',
   })
+  const [resumeData, setResumeData] = useState<ResumeData>(initialResumeData)
+  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null)
 
   const handleLogout = async () => {
     await logout()
@@ -56,6 +75,34 @@ export function ProfilePage() {
       location: user?.location || '',
     })
     setIsEditing(false)
+  }
+
+  const handleUploadSuccess = (data: { resumeId: string; fileName: string }) => {
+    setResumeData({
+      resumeId: data.resumeId,
+      fileName: data.fileName,
+      uploadDate: new Date(),
+    })
+  }
+
+  const handleAnalysisComplete = (result: AnalysisResult) => {
+    setAnalysisResult(result)
+  }
+
+  const handleResumeDelete = () => {
+    setResumeData(initialResumeData)
+    setAnalysisResult(null)
+  }
+
+  const handleJobSeek = (filters: JobFilters) => {
+    const params = new URLSearchParams()
+
+    filters.locations.forEach((loc) => params.append('location', loc))
+    filters.jobTypes.forEach((type) => params.append('jobType', type))
+    if (filters.postedTime) params.set('postedTime', filters.postedTime)
+    if (filters.remoteOption) params.set('remote', filters.remoteOption)
+
+    navigate(`/jobs?${params.toString()}`)
   }
 
   if (!user) {
@@ -239,6 +286,40 @@ export function ProfilePage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Resume Section */}
+        <section className="mx-auto max-w-4xl px-4 py-8">
+          {!resumeData.resumeId ? (
+            <ResumeUploader onUploadSuccess={handleUploadSuccess} />
+          ) : (
+            <ResumeDisplay
+              fileName={resumeData.fileName!}
+              uploadDate={resumeData.uploadDate!}
+              onDelete={handleResumeDelete}
+            />
+          )}
+        </section>
+
+        {/* AI Analysis Section */}
+        {resumeData.resumeId && (
+          <section className="mx-auto max-w-4xl px-4 pb-8">
+            <AIAnalysisSection
+              resumeId={resumeData.resumeId}
+              onAnalysisComplete={handleAnalysisComplete}
+            />
+          </section>
+        )}
+
+        {/* Job Filter Panel */}
+        {analysisResult && (
+          <section className="mx-auto max-w-4xl px-4 pb-8">
+            <JobFilterPanel
+              visaType={user?.visaType}
+              analysisComplete={!!analysisResult}
+              onJobSeek={handleJobSeek}
+            />
+          </section>
+        )}
       </main>
     </div>
   )
