@@ -1,14 +1,11 @@
+import { Header } from '@/components/layout/Header'
+import { Footer } from '@/components/layout/Footer'
 import { Card } from '@/components/ui/Card'
 
 export function JobDetailSkeleton() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      {/* Header */}
-      <header className="border-b bg-card px-6 py-4">
-        <div className="mx-auto max-w-4xl">
-          <div className="h-8 w-48 animate-pulse rounded bg-muted" />
-        </div>
-      </header>
+      <Header />
 
       {/* Main Content */}
       <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-6">
@@ -22,7 +19,7 @@ export function JobDetailSkeleton() {
             <div className="h-6 w-20 animate-pulse rounded-full bg-muted" />
             <div className="h-6 w-24 animate-pulse rounded-full bg-muted" />
             <div className="h-6 w-16 animate-pulse rounded-full bg-muted" />
-            <div className="h-6 w-20 animate-pulse rounded bg-muted" />
+            <div className="h-6 w-20 animate-pulse rounded-full bg-muted" />
           </div>
         </Card>
 
@@ -45,6 +42,8 @@ export function JobDetailSkeleton() {
           </div>
         </Card>
       </main>
+
+      <Footer />
     </div>
   )
 }

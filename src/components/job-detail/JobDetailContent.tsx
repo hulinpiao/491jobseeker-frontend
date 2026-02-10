@@ -1,6 +1,8 @@
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
+import { Header } from '@/components/layout/Header'
+import { Footer } from '@/components/layout/Footer'
 import { BackButton } from './BackButton'
 import { ActionButtons } from './ActionButtons'
 import type { Job } from '@/types/job'
@@ -26,12 +28,7 @@ interface JobDetailContentProps {
 export function JobDetailContent({ job }: JobDetailContentProps) {
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      {/* Header */}
-      <header className="border-b bg-card px-6 py-4">
-        <div className="mx-auto max-w-4xl">
-          <h1 className="text-2xl font-bold">491 JobSeeker</h1>
-        </div>
-      </header>
+      <Header />
 
       {/* Main Content */}
       <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-6 md:px-6 md:py-8" data-testid="job-detail">
@@ -89,6 +86,8 @@ export function JobDetailContent({ job }: JobDetailContentProps) {
           </Card>
         )}
       </main>
+
+      <Footer />
     </div>
   )
 }

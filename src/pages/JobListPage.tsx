@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { Header } from '../components/layout/Header'
+import { Footer } from '../components/layout/Footer'
 import { SearchBar } from '../components/SearchBar'
 import { FilterPanel } from '../components/FilterPanel'
 import { FilterToggle } from '../components/FilterToggle'
@@ -94,39 +96,46 @@ export function JobListPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      {/* Header */}
-      <header className="border-b bg-card px-6 py-4">
-        <div className="mx-auto max-w-7xl">
-          <h1 className="mb-4 text-2xl font-bold">491 JobSeeker</h1>
-          <SearchBar
-            value={filters.keyword ?? ''}
-            onChange={handleKeywordChange}
-            onSearch={handleSearch}
-          />
-        </div>
-      </header>
+      <Header />
 
       {/* Main Content - Vertical Stack Layout */}
-      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-4 md:px-6 md:py-6">
-        <div className="flex flex-col gap-4">
-          {/* Mobile Filter Toggle - hidden on desktop */}
-          <FilterToggle
-            show={showMobileFilter}
-            onToggle={() => setShowMobileFilter(!showMobileFilter)}
-            count={activeFilterCount}
-          />
+      <main className="flex-1">
+        {/* Search Section */}
+        <section className="border-b bg-card px-6 py-6">
+          <div className="mx-auto max-w-7xl">
+            <h1 className="mb-4 text-2xl font-bold">Find Jobs</h1>
+            <SearchBar
+              value={filters.keyword ?? ''}
+              onChange={handleKeywordChange}
+              onSearch={handleSearch}
+            />
+          </div>
+        </section>
 
-          {/* Filters - shown on desktop or when toggled on mobile */}
-          {showFilterPanel && (
-            <div className="overflow-hidden transition-all duration-300 ease-in-out">
-              <FilterPanel filters={filters} onChange={handleFilterChange} />
-            </div>
-          )}
+        {/* Filters and Job List */}
+        <section className="mx-auto w-full max-w-7xl px-4 py-4 md:px-6 md:py-6">
+          <div className="flex flex-col gap-4">
+            {/* Mobile Filter Toggle - hidden on desktop */}
+            <FilterToggle
+              show={showMobileFilter}
+              onToggle={() => setShowMobileFilter(!showMobileFilter)}
+              count={activeFilterCount}
+            />
 
-          {/* Job List */}
-          <JobList filters={filters} page={page} onPageChange={handlePageChange} />
-        </div>
+            {/* Filters - shown on desktop or when toggled on mobile */}
+            {showFilterPanel && (
+              <div className="overflow-hidden transition-all duration-300 ease-in-out">
+                <FilterPanel filters={filters} onChange={handleFilterChange} />
+              </div>
+            )}
+
+            {/* Job List */}
+            <JobList filters={filters} page={page} onPageChange={handlePageChange} />
+          </div>
+        </section>
       </main>
+
+      <Footer />
     </div>
   )
 }
