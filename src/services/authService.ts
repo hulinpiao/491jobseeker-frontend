@@ -14,6 +14,43 @@ import type {
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
 
 /**
+ * Backend API response wrapper
+ */
+interface ApiResponse<T> {
+  success: boolean
+  data?: T
+  error?: {
+    code: string
+    message: string
+    details?: unknown[]
+  }
+}
+
+/**
+ * Login response from backend
+ */
+interface LoginResponseData {
+  user: User
+  token: string
+}
+
+/**
+ * Register response from backend (no token)
+ */
+interface RegisterResponseData {
+  user: User
+  message: string
+}
+
+/**
+ * Verify email response from backend (no token yet)
+ */
+interface VerifyEmailResponseData {
+  user: User
+  message: string
+}
+
+/**
  * Get stored auth token from localStorage
  */
 function getAuthToken(): string | null {
@@ -57,7 +94,8 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({ message: 'Network error' }))
-    throw new Error(error.message || `API Error: ${response.status}`)
+    const errorMessage = error.error?.message || error.message || `API Error: ${response.status}`
+    throw new Error(errorMessage)
   }
 
   return response.json() as Promise<T>
@@ -67,46 +105,74 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
  * Login with email and password
  */
 export async function login(credentials: LoginRequest): Promise<AuthResponse> {
-  const response = await fetchApi<AuthResponse>('/api/auth/login', {
+  const response = await fetchApi<ApiResponse<LoginResponseData>>('/api/auth/login', {
     method: 'POST',
     body: JSON.stringify(credentials),
   })
 
-  setAuthToken(response.token)
-  return response
+  if (!response.success || !response.data) {
+    throw new Error(response.error?.message || 'Login failed')
+  }
+
+  setAuthToken(response.data.token)
+  return {
+    user: response.data.user,
+    token: response.data.token,
+  }
 }
 
 /**
  * Register a new user
+ * Note: Registration does not return a token (email verification required first)
  */
-export async function register(data: RegisterRequest): Promise<AuthResponse> {
-  const response = await fetchApi<AuthResponse>('/api/auth/register', {
+export async function register(data: RegisterRequest): Promise<{ user: User }> {
+  // Only send email and password to backend (other fields are optional)
+  const response = await fetchApi<ApiResponse<RegisterResponseData>>('/api/auth/register', {
     method: 'POST',
-    body: JSON.stringify(data),
+    body: JSON.stringify({
+      email: data.email,
+      password: data.password,
+    }),
   })
 
-  setAuthToken(response.token)
-  return response
+  if (!response.success || !response.data) {
+    throw new Error(response.error?.message || 'Registration failed')
+  }
+
+  // Store email for verification step
+  localStorage.setItem('pending_verification_email', data.email)
+
+  return { user: response.data.user }
 }
 
 /**
  * Verify email with code
+ * Note: Still no token - need to login after verification
  */
-export async function verifyEmail(data: VerifyEmailRequest): Promise<AuthResponse> {
-  const response = await fetchApi<AuthResponse>('/api/auth/verify-email', {
+export async function verifyEmail(data: VerifyEmailRequest): Promise<{ user: User }> {
+  const response = await fetchApi<ApiResponse<VerifyEmailResponseData>>('/api/auth/verify-email', {
     method: 'POST',
     body: JSON.stringify(data),
   })
 
-  setAuthToken(response.token)
-  return response
+  if (!response.success || !response.data) {
+    throw new Error(response.error?.message || 'Verification failed')
+  }
+
+  return { user: response.data.user }
 }
 
 /**
  * Get current user profile
  */
 export async function getCurrentUser(): Promise<User> {
-  return fetchApi<User>('/api/auth/me')
+  const response = await fetchApi<ApiResponse<{ user: User }>>('/api/auth/me')
+
+  if (!response.success || !response.data) {
+    throw new Error(response.error?.message || 'Failed to get user')
+  }
+
+  return response.data.user
 }
 
 /**
@@ -114,9 +180,10 @@ export async function getCurrentUser(): Promise<User> {
  */
 export async function logout(): Promise<void> {
   try {
-    await fetchApi<void>('/api/auth/logout', { method: 'POST' })
+    await fetchApi<ApiResponse<void>>('/api/auth/logout', { method: 'POST' })
   } finally {
     removeAuthToken()
+    localStorage.removeItem('pending_verification_email')
   }
 }
 
@@ -124,10 +191,16 @@ export async function logout(): Promise<void> {
  * Update user profile
  */
 export async function updateProfile(data: Partial<User>): Promise<User> {
-  return fetchApi<User>('/api/users/profile', {
+  const response = await fetchApi<ApiResponse<{ user: User }>>('/api/users/profile', {
     method: 'PUT',
     body: JSON.stringify(data),
   })
+
+  if (!response.success || !response.data) {
+    throw new Error(response.error?.message || 'Failed to update profile')
+  }
+
+  return response.data.user
 }
 
 /**
@@ -142,4 +215,18 @@ export function isAuthenticated(): boolean {
  */
 export function getToken(): string | null {
   return getAuthToken()
+}
+
+/**
+ * Get pending verification email (stored during registration)
+ */
+export function getPendingEmail(): string | null {
+  return localStorage.getItem('pending_verification_email')
+}
+
+/**
+ * Clear pending verification email
+ */
+export function clearPendingEmail(): void {
+  localStorage.removeItem('pending_verification_email')
 }
