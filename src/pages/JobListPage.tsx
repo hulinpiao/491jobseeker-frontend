@@ -16,13 +16,13 @@ export function JobListPage() {
 
   // Read filters from URL params
   const filters: JobFilters = useMemo(() => {
-    const keyword = searchParams.get('keyword') || undefined
+    const q = searchParams.get('q') || searchParams.get('keyword') || undefined
     const location = searchParams.get('location') || undefined
     const employmentType = (searchParams.get('employmentType') as EmploymentType) || undefined
     const workArrangement = (searchParams.get('workArrangement') as WorkArrangement) || undefined
 
     return {
-      ...(keyword && { keyword }),
+      ...(q && { q }),
       ...(location && { location }),
       ...(employmentType && { employmentType }),
       ...(workArrangement && { workArrangement }),
@@ -43,9 +43,10 @@ export function JobListPage() {
   const handleKeywordChange = (keyword: string) => {
     const newParams = new URLSearchParams(searchParams)
     if (keyword) {
-      newParams.set('keyword', keyword)
+      newParams.set('q', keyword)
     } else {
-      newParams.delete('keyword')
+      newParams.delete('q')
+      newParams.delete('keyword') // Also remove old param for backward compatibility
     }
     setSearchParams(newParams)
   }
@@ -54,10 +55,11 @@ export function JobListPage() {
     const newParams = new URLSearchParams(searchParams)
 
     // Update params based on new filters
-    if (newFilters.keyword) {
-      newParams.set('keyword', newFilters.keyword)
+    if (newFilters.q) {
+      newParams.set('q', newFilters.q)
     } else {
-      newParams.delete('keyword')
+      newParams.delete('q')
+      newParams.delete('keyword') // Also remove old param for backward compatibility
     }
 
     if (newFilters.location) {
@@ -105,7 +107,7 @@ export function JobListPage() {
           <div className="mx-auto max-w-7xl">
             <h1 className="mb-4 text-2xl font-bold">Find Jobs</h1>
             <SearchBar
-              value={filters.keyword ?? ''}
+              value={filters.q ?? ''}
               onChange={handleKeywordChange}
               onSearch={handleSearch}
             />

@@ -1,7 +1,7 @@
 import { Select } from './ui/Select'
 import { Input } from './ui/Input'
 import { Button } from './ui/Button'
-import type { JobFilters, EmploymentType, WorkArrangement } from '@/types/job'
+import type { JobFilters } from '@/types/job'
 
 interface FilterPanelProps {
   filters: JobFilters
@@ -19,13 +19,20 @@ const EMPLOYMENT_TYPES = [
 
 const WORK_ARRANGEMENTS = [
   { value: '', label: 'All Arrangements' },
-  { value: 'onsite', label: 'On-site' },
-  { value: 'hybrid', label: 'Hybrid' },
   { value: 'remote', label: 'Remote' },
+  { value: 'hybrid', label: 'Hybrid' },
+  { value: 'onsite', label: 'On-site' },
+] as const
+
+const PLATFORMS = [
+  { value: '', label: 'All Platforms' },
+  { value: 'linkedin', label: 'LinkedIn' },
+  { value: 'indeed', label: 'Indeed' },
+  { value: 'seek', label: 'Seek' },
 ] as const
 
 export function FilterPanel({ filters, onChange }: FilterPanelProps) {
-  const updateFilter = (key: keyof JobFilters, value: string | undefined) => {
+  const updateFilter = (key: keyof JobFilters, value: string | number | undefined) => {
     onChange({ ...filters, [key]: value || undefined })
   }
 
@@ -46,51 +53,89 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
         )}
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="flex-1">
-          <label htmlFor="location" className="mb-1 block text-sm font-medium">
-            Location
+      <div className="space-y-4">
+        {/* Keyword Search */}
+        <div>
+          <label htmlFor="q" className="mb-1 block text-sm font-medium">
+            Search
           </label>
           <Input
-            id="location"
-            placeholder="Enter city..."
-            value={filters.location ?? ''}
-            onChange={(e) => updateFilter('location', e.target.value)}
+            id="q"
+            placeholder="Job title, company, or skills..."
+            value={filters.q ?? ''}
+            onChange={(e) => updateFilter('q', e.target.value)}
           />
         </div>
 
-        <div className="flex-1">
-          <label htmlFor="employmentType" className="mb-1 block text-sm font-medium">
-            Employment Type
-          </label>
-          <Select
-            id="employmentType"
-            value={filters.employmentType ?? ''}
-            onChange={(e) => updateFilter('employmentType', e.target.value as EmploymentType | undefined)}
-          >
-            {EMPLOYMENT_TYPES.map((type) => (
-              <option key={type.value} value={type.value}>
-                {type.label}
-              </option>
-            ))}
-          </Select>
+        <div className="flex flex-col sm:flex-row gap-4">
+          {/* Location */}
+          <div className="flex-1">
+            <label htmlFor="location" className="mb-1 block text-sm font-medium">
+              Location
+            </label>
+            <Input
+              id="location"
+              placeholder="City or state..."
+              value={filters.location ?? ''}
+              onChange={(e) => updateFilter('location', e.target.value)}
+            />
+          </div>
+
+          {/* Platform */}
+          <div className="flex-1">
+            <label htmlFor="platform" className="mb-1 block text-sm font-medium">
+              Platform
+            </label>
+            <Select
+              id="platform"
+              value={filters.platform ?? ''}
+              onChange={(e) => updateFilter('platform', e.target.value)}
+            >
+              {PLATFORMS.map((platform) => (
+                <option key={platform.value} value={platform.value}>
+                  {platform.label}
+                </option>
+              ))}
+            </Select>
+          </div>
         </div>
 
-        <div className="flex-1">
-          <label htmlFor="workArrangement" className="mb-1 block text-sm font-medium">
-            Work Arrangement
-          </label>
-          <Select
-            id="workArrangement"
-            value={filters.workArrangement ?? ''}
-            onChange={(e) => updateFilter('workArrangement', e.target.value as WorkArrangement | undefined)}
-          >
-            {WORK_ARRANGEMENTS.map((arrangement) => (
-              <option key={arrangement.value} value={arrangement.value}>
-                {arrangement.label}
-              </option>
-            ))}
-          </Select>
+        <div className="flex flex-col sm:flex-row gap-4">
+          {/* Employment Type */}
+          <div className="flex-1">
+            <label htmlFor="employmentType" className="mb-1 block text-sm font-medium">
+              Employment Type
+            </label>
+            <Select
+              id="employmentType"
+              value={filters.employmentType ?? ''}
+              onChange={(e) => updateFilter('employmentType', e.target.value)}
+            >
+              {EMPLOYMENT_TYPES.map((type) => (
+                <option key={type.value} value={type.value}>
+                  {type.label}
+                </option>
+              ))}
+            </Select>
+          </div>
+
+          {/* Work Arrangement */}
+          <div className="flex-1">
+            <label htmlFor="workArrangement" className="mb-1 block text-sm font-medium">
+              Work Arrangement
+            </label>
+            <Select
+              id="workArrangement"
+              value={filters.workArrangement ?? ''}
+              onChange={(e) => updateFilter('workArrangement', e.target.value)}
+            >
+              {WORK_ARRANGEMENTS.map((arrangement) => (
+                <option key={arrangement.value} value={arrangement.value}>
+                  {arrangement.label}
+                </option>
+              ))}
+            </Select>
+          </div>
         </div>
       </div>
     </div>

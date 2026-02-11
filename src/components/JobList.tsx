@@ -4,7 +4,6 @@ import { JobCard } from './JobCard'
 import { Pagination } from './Pagination'
 import type { Job, JobFilters } from '@/types/job'
 import { fetchJobs as apiFetchJobs } from '@/services/api'
-import { normalizeJob } from '@/types/job'
 
 interface JobListProps {
   filters: JobFilters
@@ -14,26 +13,17 @@ interface JobListProps {
 }
 
 export function JobList({ filters, page = 1, onPageChange, selectedJobId }: JobListProps) {
-  const limit = 10
+  const limit = 20
 
   // Build query key from filters and page
   const queryKey = useMemo(() => ['jobs', filters, page], [filters, page])
 
   const { data, isLoading, error } = useQuery({
     queryKey,
-    queryFn: () =>
-      apiFetchJobs({
-        page,
-        limit,
-        keyword: filters.keyword,
-        location: filters.location,
-        employmentType: filters.employmentType,
-        workArrangement: filters.workArrangement,
-      }),
+    queryFn: () => apiFetchJobs({ ...filters, page, limit }),
   })
 
-  // Normalize API jobs to frontend Jobs
-  const jobs: Job[] = data?.data.map(normalizeJob) ?? []
+  const jobs: Job[] = data?.jobs ?? []
   const total = data?.total ?? 0
   const totalPages = data?.totalPages ?? 1
 
