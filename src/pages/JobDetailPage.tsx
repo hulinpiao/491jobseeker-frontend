@@ -1,7 +1,6 @@
 import { useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { fetchJobById } from '@/services/api'
-import { normalizeJob } from '@/types/job'
 import { JobDetailSkeleton } from '@/components/job-detail/JobDetailSkeleton'
 import { JobDetailError } from '@/components/job-detail/JobDetailError'
 import { JobNotFound } from '@/components/job-detail/JobNotFound'
@@ -12,10 +11,7 @@ export function JobDetailPage() {
 
   const { data, isLoading, error, isError } = useQuery({
     queryKey: ['job', jobId],
-    queryFn: async () => {
-      const apiJob = await fetchJobById(jobId!)
-      return normalizeJob(apiJob)
-    },
+    queryFn: () => fetchJobById(jobId!),
     enabled: !!jobId,
     retry: 1,
   })
